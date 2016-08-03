@@ -1,5 +1,6 @@
 module Test exposing (..)
 
+import String
 import Json.Encode
 import Json.Decode
 import Task
@@ -23,18 +24,20 @@ type alias Model = String
 view : Model -> Html Event
 view model =
     Html.div []
-        [ Html.div [] [ Html.button [ Html.Events.onClick Set        ] [ Html.text "Set" ]]
-        , Html.div [] [ Html.button [ Html.Events.onClick SetCorrupt ] [ Html.text "Set Corrupt" ]]
-        , Html.div [] [ Html.button [ Html.Events.onClick Get        ] [ Html.text "Get" ]]
-        , Html.div [] [ Html.button [ Html.Events.onClick Keys       ] [ Html.text "Keys" ]]
-        , Html.div [] [ Html.button [ Html.Events.onClick Remove     ] [ Html.text "Remove" ]]
-        , Html.div [] [ Html.button [ Html.Events.onClick Clear      ] [ Html.text "Clear" ]]
+        [ Html.div [] [ Html.button [ Html.Events.onClick Set              ] [ Html.text "Set" ]]
+        , Html.div [] [ Html.button [ Html.Events.onClick SetValueCorrupt  ] [ Html.text "Set Value Corrupt" ]]
+        , Html.div [] [ Html.button [ Html.Events.onClick SetQuotaExceeded ] [ Html.text "Set Quota Exceeded" ]]
+        , Html.div [] [ Html.button [ Html.Events.onClick Get              ] [ Html.text "Get" ]]
+        , Html.div [] [ Html.button [ Html.Events.onClick Keys             ] [ Html.text "Keys" ]]
+        , Html.div [] [ Html.button [ Html.Events.onClick Remove           ] [ Html.text "Remove" ]]
+        , Html.div [] [ Html.button [ Html.Events.onClick Clear            ] [ Html.text "Clear" ]]
         , Html.div [] [ Html.text model ]
         ]
 
 type Event
     = Set
-    | SetCorrupt
+    | SetValueCorrupt
+    | SetQuotaExceeded
     | Get
     | Keys
     | Remove
@@ -57,8 +60,10 @@ update event model =
         case event of
             Set ->
                 model ! [Task.perform (SetFailure) (always Success) (Local.set (Json.Encode.int 5) key)]
-            SetCorrupt ->
-                model ! [Task.perform (SetFailure) (always Success) (Local.set (Json.Encode.string "5x") key)]
+            SetValueCorrupt ->
+                model ! [Task.perform (SetFailure) (always Success) (Local.set (Json.Encode.string "x") key)]
+            SetQuotaExceeded ->
+                model ! [Task.perform (SetFailure) (always Success) (Local.set (Json.Encode.string <| String.repeat (5 * 1024 * 1024) "x") key)]
             Get ->
                 model ! [Task.perform (GetFailure) (GetSuccess) (Local.get Json.Decode.int key)]
             Keys ->

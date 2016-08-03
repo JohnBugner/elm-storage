@@ -5,15 +5,20 @@
 var _JohnBugner$elm_storage$Native_Local = function() {
     function rawSet(value, key) {
     	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+    		var errorName = null;
+
     		try {
     			window.localStorage.setItem(key, value);
     		} catch (e) {
-    			if (e === DOMException.QUOTA_EXCEEDED_ERR) {
-    				callback(_elm_lang$core$Native_Scheduler.succeed({ctor : "Nothing"}));
+    			if (e.name === "QuotaExceededError") {
+    				errorName = e.name;
+    				callback(_elm_lang$core$Native_Scheduler.fail({ctor : "QuotaExceeded"}));
+    			}
+    		} finally {
+    			if (errorName === null) {
+    				callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
     			}
     		}
-
-    		callback(_elm_lang$core$Native_Scheduler.succeed({ctor : "Just", _0 : _elm_lang$core$Native_Utils.Tuple0}));
     	});
     }
 

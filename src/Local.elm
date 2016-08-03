@@ -29,14 +29,7 @@ type GetError
 {-| Set a key to a value.
 -}
 set : Value -> Key -> Task SetError ()
-set value key =
-    let
-        f : Maybe () -> Task SetError ()
-        f maybe = case maybe of
-            Nothing -> Task.fail QuotaExceeded
-            Just () -> Task.succeed ()
-    in
-        Native.Local.rawSet value key `Task.andThen` f
+set = Native.Local.rawSet
 
 {-| Get a key's value.
 -}
