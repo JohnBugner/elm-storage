@@ -41,7 +41,7 @@ type Event
     | Clear
 
     | Success
-    | GetSuccess Int
+    | GetSuccess (Maybe Int)
     | KeysSuccess (List Key)
 
     | Failure

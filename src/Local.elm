@@ -24,8 +24,7 @@ type SetError
 {-| Possible errors when getting a key.
 -}
 type GetError
-    = KeyNotFound
-    | ValueCorrupt
+    = ValueCorrupt
 
 {-| Set a key to a value.
 -}
@@ -41,7 +40,7 @@ set value key =
 
 {-| Get a key's value.
 -}
-get : Decoder a -> Key -> Task GetError a
+get : Decoder a -> Key -> Task GetError (Maybe a)
 get decoder key =
     let
         -- This type annotation causes an error,
@@ -49,10 +48,10 @@ get decoder key =
         -- shared with the inner annotation.
 --        f : Maybe String -> Task GetError a
         f maybe = case maybe of
-            Nothing -> Task.fail KeyNotFound
+            Nothing -> Task.succeed Nothing
             Just unparsedValue -> case Json.Decode.decodeString decoder unparsedValue of
                 Err _ -> Task.fail ValueCorrupt
-                Ok value -> Task.succeed value
+                Ok value -> Task.succeed (Just value)
     in
         Native.Local.rawGet key `Task.andThen` f
 
