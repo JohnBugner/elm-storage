@@ -1,24 +1,20 @@
+//import Native.Scheduler //
 //import Native.Utils //
 //import Native.List //
-//import Native.Scheduler //
 
 var _JohnBugner$elm_storage$Native_Local = function() {
     function rawSet(value, key) {
     	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-    		var errorName = null;
-
     		try {
     			window.localStorage.setItem(key, value);
     		} catch (e) {
-    			if (e.name === "QuotaExceededError") {
-    				errorName = e.name;
+    			if (e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED") {
     				callback(_elm_lang$core$Native_Scheduler.fail({ctor : "QuotaExceeded"}));
-    			}
-    		} finally {
-    			if (errorName === null) {
-    				callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+    				return;
     			}
     		}
+
+    		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
     	});
     }
 
