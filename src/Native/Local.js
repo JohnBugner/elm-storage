@@ -1,6 +1,6 @@
+//import Native.List //
 //import Native.Scheduler //
 //import Native.Utils //
-//import Native.List //
 
 var _JohnBugner$elm_storage$Native_Local = function() {
     function rawSet(value, key) {
