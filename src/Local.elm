@@ -1,6 +1,6 @@
 module Local exposing (..)
 
-{-| Store things in local storage.
+{-| Store and load things with local storage.
 
 # Storage
 @docs Key, SetError, GetError, set, get, keys, remove, clear
