@@ -3,7 +3,7 @@ module Local exposing (..)
 {-| Store and load things with local storage.
 
 # Storage
-@docs Key, SetError, GetError, set, get, keys, remove, clear
+@docs Key, Error, set, get, keys, remove, clear
 -}
 import Native.Local
 
@@ -16,30 +16,26 @@ import Json.Encode exposing (Value)
 -}
 type alias Key = String
 
-{-| Possible errors when setting a key.
+{-| Possible errors.
 -}
-type SetError
+type Error
     = QuotaExceeded
-
-{-| Possible errors when getting a key.
--}
-type GetError
-    = ValueCorrupt
+    | ValueCorrupt
 
 {-| Set a key to a value.
 -}
-set : Value -> Key -> Task SetError ()
+set : Value -> Key -> Task Error ()
 set = Native.Local.rawSet
 
 {-| Get a key's value.
 -}
-get : Decoder a -> Key -> Task GetError (Maybe a)
+get : Decoder a -> Key -> Task Error (Maybe a)
 get decoder key =
     let
         -- This type annotation causes an error,
         -- because the `a` of the outer annotation is not
         -- shared with the inner annotation.
---        f : Maybe String -> Task GetError a
+--        f : Maybe String -> Task Error a
         f maybe = case maybe of
             Nothing -> Task.succeed Nothing
             Just unparsedValue -> case Json.Decode.decodeString decoder unparsedValue of

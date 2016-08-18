@@ -9,7 +9,7 @@ import Html exposing (Html)
 import Html.App
 import Html.Events
 
-import Local exposing (Key, SetError, GetError)
+import Local exposing (Key, Error)
 
 main : Program Never
 main = Html.App.program
@@ -31,6 +31,7 @@ view model =
         , Html.div [] [ Html.button [ Html.Events.onClick Keys             ] [ Html.text "Keys" ]]
         , Html.div [] [ Html.button [ Html.Events.onClick Remove           ] [ Html.text "Remove" ]]
         , Html.div [] [ Html.button [ Html.Events.onClick Clear            ] [ Html.text "Clear" ]]
+        , Html.div [] [ Html.button [ Html.Events.onClick SetGet           ] [ Html.text "Set, Get" ]]
         , Html.div [] [ Html.text model ]
         ]
 
@@ -42,47 +43,70 @@ type Event
     | Keys
     | Remove
     | Clear
+    | SetGet
 
     | Success
     | GetSuccess (Maybe Int)
     | KeysSuccess (List Key)
 
     | Failure
-    | SetFailure SetError
-    | GetFailure GetError
+    | ErrorFailure Error
 
 update : Event -> Model -> (Model, Cmd Event)
 update event model =
     let
         key : Key
         key = "a"
-    in
-        case event of
-            Set ->
-                model ! [Task.perform (SetFailure) (always Success) (Local.set (Json.Encode.int 5) key)]
-            SetValueCorrupt ->
-                model ! [Task.perform (SetFailure) (always Success) (Local.set (Json.Encode.string "x") key)]
-            SetQuotaExceeded ->
-                model ! [Task.perform (SetFailure) (always Success) (Local.set (Json.Encode.string <| String.repeat (5 * 1024 * 1024) "x") key)]
-            Get ->
-                model ! [Task.perform (GetFailure) (GetSuccess) (Local.get Json.Decode.int key)]
-            Keys ->
-                model ! [Task.perform (always Failure) (KeysSuccess) (Local.keys)]
-            Remove ->
-                model ! [Task.perform (always Failure) (always Success) (Local.remove key)]
-            Clear ->
-                model ! [Task.perform (always Failure) (always Success) (Local.clear)]
+    in case event of
+        Set ->
+            model !
+            [ Task.perform (ErrorFailure) (always Success)
+            (Local.set (Json.Encode.int 5) key)
+            ]
+        SetValueCorrupt ->
+            model !
+            [ Task.perform (ErrorFailure) (always Success)
+            (Local.set (Json.Encode.string "x") key)
+            ]
+        SetQuotaExceeded ->
+            model !
+            [ Task.perform (ErrorFailure) (always Success)
+            (Local.set (Json.Encode.string <| String.repeat (5 * 1024 * 1024) "x") key)
+            ]
+        Get ->
+            model !
+            [ Task.perform (ErrorFailure) (GetSuccess)
+            (Local.get Json.Decode.int key)
+            ]
+        Keys ->
+            model !
+            [ Task.perform (always Failure) (KeysSuccess)
+            (Local.keys)
+            ]
+        Remove ->
+            model !
+            [ Task.perform (always Failure) (always Success)
+            (Local.remove key)
+            ]
+        Clear ->
+            model !
+            [ Task.perform (always Failure) (always Success)
+            (Local.clear)
+            ]
+        SetGet ->
+            model !
+            [ Task.perform (ErrorFailure) (GetSuccess)
+            ((Local.set (Json.Encode.int 6) key) `Task.andThen` (\ () -> Local.get Json.Decode.int key))
+            ]
 
-            Success ->
-                ("success") ! [Cmd.none]
-            GetSuccess model' ->
-                ("get success : " ++ toString model') ! [Cmd.none]
-            KeysSuccess keys ->
-                ("keys success : " ++ toString keys) ! [Cmd.none]
+        Success ->
+            ("success") ! []
+        GetSuccess model' ->
+            ("get success : " ++ toString model') ! []
+        KeysSuccess keys ->
+            ("keys success : " ++ toString keys) ! []
 
-            Failure ->
-                ("failure") ! [Cmd.none]
-            SetFailure error ->
-                ("set failure : " ++ toString error) ! [Cmd.none]
-            GetFailure error ->
-                ("get failure : " ++ toString error) ! [Cmd.none]
+        Failure ->
+            ("failure") ! []
+        ErrorFailure error ->
+            ("error failure : " ++ toString error) ! []
