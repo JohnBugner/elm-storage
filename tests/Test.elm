@@ -21,7 +21,7 @@ main = Html.App.program
 
 type alias Model = String
 
-view : Model -> Html Event
+view : Model -> Html Message
 view model =
     Html.div []
         [ Html.div [] [ Html.button [ Html.Events.onClick Set              ] [ Html.text "Set" ]]
@@ -35,7 +35,7 @@ view model =
         , Html.div [] [ Html.text model ]
         ]
 
-type Event
+type Message
     = Set
     | SetValueCorrupt
     | SetQuotaExceeded
@@ -52,7 +52,7 @@ type Event
     | Failure
     | ErrorFailure Error
 
-update : Event -> Model -> (Model, Cmd Event)
+update : Message -> Model -> (Model, Cmd Message)
 update event model =
     let
         key : Key
