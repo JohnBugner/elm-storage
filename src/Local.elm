@@ -42,7 +42,8 @@ get decoder key =
                 Err _ -> Task.fail ValueCorrupt
                 Ok value -> Task.succeed (Just value)
     in
-        Native.Local.rawGet key `Task.andThen` f
+        Native.Local.rawGet key
+        |> Task.andThen f
 
 {-| Get a list of all keys that have a value.
 -}

@@ -6,13 +6,12 @@ import Json.Decode
 import Task
 
 import Html exposing (Html)
-import Html.App
 import Html.Events
 
 import Local exposing (Key, Error)
 
-main : Program Never
-main = Html.App.program
+main : Program Never Model Message
+main = Html.program
     { init = update Get ""
     , view = view
     , update = update
@@ -49,64 +48,70 @@ type Message
     | GetSuccess (Maybe Int)
     | KeysSuccess (List Key)
 
-    | Failure
-    | ErrorFailure Error
+    | Failure Error
 
 update : Message -> Model -> (Model, Cmd Message)
 update event model =
     let
         key : Key
         key = "a"
+        resultHandler : Result Error a -> Message
+        resultHandler result = case result of
+            Ok _ -> Success
+            Err x -> Failure x
     in case event of
         Set ->
             model !
-            [ Task.perform (ErrorFailure) (always Success)
+            [ Task.attempt
+            resultHandler
             (Local.set (Json.Encode.int 5) key)
             ]
         SetValueCorrupt ->
             model !
-            [ Task.perform (ErrorFailure) (always Success)
+            [ Task.attempt
+            resultHandler
             (Local.set (Json.Encode.string "x") key)
             ]
         SetQuotaExceeded ->
             model !
-            [ Task.perform (ErrorFailure) (always Success)
+            [ Task.attempt
+            resultHandler
             (Local.set (Json.Encode.string <| String.repeat (5 * 1024 * 1024) "x") key)
             ]
         Get ->
             model !
-            [ Task.perform (ErrorFailure) (GetSuccess)
+            [ Task.attempt
+            resultHandler
             (Local.get Json.Decode.int key)
             ]
         Keys ->
             model !
-            [ Task.perform (always Failure) (KeysSuccess)
+            [ Task.perform (KeysSuccess)
             (Local.keys)
             ]
         Remove ->
             model !
-            [ Task.perform (always Failure) (always Success)
+            [ Task.perform (always Success)
             (Local.remove key)
             ]
         Clear ->
             model !
-            [ Task.perform (always Failure) (always Success)
+            [ Task.perform (always Success)
             (Local.clear)
             ]
         SetGet ->
             model !
-            [ Task.perform (ErrorFailure) (GetSuccess)
-            ((Local.set (Json.Encode.int 6) key) `Task.andThen` (\ () -> Local.get Json.Decode.int key))
+            [ Task.attempt
+            resultHandler
+            ((Local.set (Json.Encode.int 6) key) |> Task.andThen (\ () -> Local.get Json.Decode.int key))
             ]
 
         Success ->
             ("success") ! []
-        GetSuccess model' ->
-            ("get success : " ++ toString model') ! []
+        GetSuccess modelx ->
+            ("get success : " ++ toString modelx) ! []
         KeysSuccess keys ->
             ("keys success : " ++ toString keys) ! []
 
-        Failure ->
-            ("failure") ! []
-        ErrorFailure error ->
+        Failure error ->
             ("error failure : " ++ toString error) ! []
