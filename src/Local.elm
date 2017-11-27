@@ -19,7 +19,9 @@ type alias Key = String
 {-| Possible errors.
 -}
 type Error
-    = QuotaExceeded
+    = Unavailable
+    | PermissionDenied
+    | QuotaExceeded
     | ValueCorrupt
 
 {-| Set a key to a value.
