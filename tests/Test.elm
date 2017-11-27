@@ -51,67 +51,72 @@ type Message
     | Failure Error
 
 update : Message -> Model -> (Model, Cmd Message)
-update event model =
+update message model =
     let
         key : Key
         key = "a"
         resultHandler : Result Error a -> Message
-        resultHandler result = case result of
-            Ok _ -> Success
-            Err x -> Failure x
-    in case event of
-        Set ->
-            model !
-            [ Task.attempt
-            resultHandler
-            (Local.set (Json.Encode.int 5) key)
-            ]
-        SetValueCorrupt ->
-            model !
-            [ Task.attempt
-            resultHandler
-            (Local.set (Json.Encode.string "x") key)
-            ]
-        SetQuotaExceeded ->
-            model !
-            [ Task.attempt
-            resultHandler
-            (Local.set (Json.Encode.string <| String.repeat (5 * 1024 * 1024) "x") key)
-            ]
-        Get ->
-            model !
-            [ Task.attempt
-            resultHandler
-            (Local.get Json.Decode.int key)
-            ]
-        Keys ->
-            model !
-            [ Task.perform (KeysSuccess)
-            (Local.keys)
-            ]
-        Remove ->
-            model !
-            [ Task.perform (always Success)
-            (Local.remove key)
-            ]
-        Clear ->
-            model !
-            [ Task.perform (always Success)
-            (Local.clear)
-            ]
-        SetGet ->
-            model !
-            [ Task.attempt
-            resultHandler
-            ((Local.set (Json.Encode.int 6) key) |> Task.andThen (\ () -> Local.get Json.Decode.int key))
-            ]
+        resultHandler result =
+            case result of
+                Ok _ -> Success
+                Err x -> Failure x
+    in
+        case message of
+            Set ->
+                model !
+                [ Task.attempt
+                resultHandler
+                (Local.set (Json.Encode.int 5) key)
+                ]
+            SetValueCorrupt ->
+                model !
+                [ Task.attempt
+                resultHandler
+                (Local.set (Json.Encode.string "x") key)
+                ]
+            SetQuotaExceeded ->
+                model !
+                [ Task.attempt
+                resultHandler
+                (Local.set (Json.Encode.string <| String.repeat (5 * 1024 * 1024) "x") key)
+                ]
+            Get ->
+                model !
+                [ Task.attempt
+                resultHandler
+                (Local.get Json.Decode.int key)
+                ]
+            Keys ->
+                model !
+                [ Task.perform
+                (KeysSuccess)
+                (Local.keys)
+                ]
+            Remove ->
+                model !
+                [ Task.perform
+                (always Success)
+                (Local.remove key)
+                ]
+            Clear ->
+                model !
+                [ Task.perform
+                (always Success)
+                (Local.clear)
+                ]
+            SetGet ->
+                model !
+                [ Task.attempt
+                resultHandler
+                ((Local.set (Json.Encode.int 6) key) |> Task.andThen (\ () -> Local.get Json.Decode.int key))
+                ]
 
-        Success ->
-            ("success") ! []
-        GetSuccess modelx ->
-            ("get success : " ++ toString modelx) ! []
-        KeysSuccess keys ->
-            ("keys success : " ++ toString keys) ! []
+            Success ->
+                ("success") ! []
+            GetSuccess model_ ->
+                ("get success : " ++ toString model_) ! []
+            KeysSuccess keys ->
+                ("keys success : " ++ toString keys) ! []
 
-        Failure error ->
-            ("error failure : " ++ toString error) ! []
+            Failure error ->
+                ("error failure : " ++ toString error) ! []
