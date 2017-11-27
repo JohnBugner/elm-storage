@@ -15,6 +15,7 @@ var _JohnBugner$elm_storage$Native_Local = function() {
             }
 
             callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+            return;
         });
     }
 
@@ -24,8 +25,10 @@ var _JohnBugner$elm_storage$Native_Local = function() {
 
             if (value === null) {
                 callback(_elm_lang$core$Native_Scheduler.succeed({ctor : "Nothing"}));
+                return;
             } else {
                 callback(_elm_lang$core$Native_Scheduler.succeed({ctor : "Just", _0 : value}));
+                return;
             }
         });
     }
@@ -41,6 +44,7 @@ var _JohnBugner$elm_storage$Native_Local = function() {
             }
 
             callback(_elm_lang$core$Native_Scheduler.succeed(keyList));
+            return;
         });
     }
 
@@ -49,6 +53,7 @@ var _JohnBugner$elm_storage$Native_Local = function() {
             window.localStorage.removeItem(key);
 
             callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+            return;
         });
     }
 
@@ -57,6 +62,7 @@ var _JohnBugner$elm_storage$Native_Local = function() {
             window.localStorage.clear();
 
             callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+            return;
         });
     }
 
