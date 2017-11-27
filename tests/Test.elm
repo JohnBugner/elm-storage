@@ -43,12 +43,7 @@ type Message
     | Remove
     | Clear
     | SetGet
-
-    | Success
-    | GetSuccess (Maybe Int)
-    | KeysSuccess (List Key)
-
-    | Failure Error
+    | ChangeModel String
 
 update : Message -> Model -> (Model, Cmd Message)
 update message model =
@@ -56,10 +51,7 @@ update message model =
         key : Key
         key = "a"
         resultHandler : Result Error a -> Message
-        resultHandler result =
-            case result of
-                Ok _ -> Success
-                Err x -> Failure x
+        resultHandler = ChangeModel << toString
     in
         case message of
             Set ->
@@ -88,35 +80,32 @@ update message model =
                 ]
             Keys ->
                 model !
-                [ Task.perform
-                (KeysSuccess)
+                [ Task.attempt
+                --[ Task.perform
+                --(KeysSuccess)
+                resultHandler
                 (Local.keys)
                 ]
             Remove ->
                 model !
-                [ Task.perform
-                (always Success)
+                [ Task.attempt
+                --[ Task.perform
+                --(always Success)
+                resultHandler
                 (Local.remove key)
                 ]
             Clear ->
                 model !
-                [ Task.perform
-                (always Success)
+                [ Task.attempt
+                --[ Task.perform
+                --(always Success)
+                resultHandler
                 (Local.clear)
                 ]
             SetGet ->
                 model !
                 [ Task.attempt
                 resultHandler
-                ((Local.set (Json.Encode.int 6) key) |> Task.andThen (\ () -> Local.get Json.Decode.int key))
+                ((Local.set (Json.Encode.int 10) key) |> Task.andThen (\ () -> Local.get Json.Decode.int key))
                 ]
-
-            Success ->
-                ("success") ! []
-            GetSuccess model_ ->
-                ("get success : " ++ toString model_) ! []
-            KeysSuccess keys ->
-                ("keys success : " ++ toString keys) ! []
-
-            Failure error ->
-                ("error failure : " ++ toString error) ! []
+            ChangeModel model_ -> model_ ! []
