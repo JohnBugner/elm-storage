@@ -45,15 +45,15 @@ get decoder key =
 
 {-| Get a list of all keys that have a value.
 -}
-keys : Task x (List Key)
-keys = Native.Local.keys
+keys : Task Error (List Key)
+keys = Native.Local.keys ()
 
 {-| Remove a key and its value.
 -}
-remove : Key -> Task x ()
+remove : Key -> Task Error ()
 remove = Native.Local.remove
 
 {-| Remove all keys and their values.
 -}
-clear : Task x ()
-clear = Native.Local.clear
+clear : Task Error ()
+clear = Native.Local.clear ()
