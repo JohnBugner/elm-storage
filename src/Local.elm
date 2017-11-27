@@ -32,18 +32,16 @@ set = Native.Local.rawSet
 get : Decoder a -> Key -> Task Error (Maybe a)
 get decoder key =
     let
-        -- This type annotation causes an error,
-        -- because the `a` of the outer annotation is not
-        -- shared with the inner annotation.
---        f : Maybe String -> Task Error a
-        f maybe = case maybe of
-            Nothing -> Task.succeed Nothing
-            Just unparsedValue -> case Json.Decode.decodeString decoder unparsedValue of
-                Err _ -> Task.fail ValueCorrupt
-                Ok value -> Task.succeed (Just value)
+        f : Maybe String -> Task Error (Maybe a)
+        f muv =
+            case muv of
+                Nothing -> Task.succeed Nothing
+                Just uv ->
+                    case Json.Decode.decodeString decoder uv of
+                        Err _ -> Task.fail ValueCorrupt
+                        Ok v -> Task.succeed (Just v)
     in
-        Native.Local.rawGet key
-        |> Task.andThen f
+        Native.Local.rawGet key |> Task.andThen f
 
 {-| Get a list of all keys that have a value.
 -}
