@@ -9,6 +9,9 @@ var _JohnBugner$elm_storage$Native_Local = function() {
                 if (window.localStorage === undefined) {
                     callback(_elm_lang$core$Native_Scheduler.fail({ctor : "Unavailable"}));
                     return;
+                } else if (window.localStorage === null) {
+                    callback(_elm_lang$core$Native_Scheduler.fail({ctor : "PermissionDenied"}));
+                    return;
                 }
             } catch (e) {
                 if (e.name === "SecurityError") {
@@ -36,6 +39,9 @@ var _JohnBugner$elm_storage$Native_Local = function() {
             try {
                 if (window.localStorage === undefined) {
                     callback(_elm_lang$core$Native_Scheduler.fail({ctor : "Unavailable"}));
+                    return;
+                } else if (window.localStorage === null) {
+                    callback(_elm_lang$core$Native_Scheduler.fail({ctor : "PermissionDenied"}));
                     return;
                 }
             } catch (e) {
@@ -65,6 +71,9 @@ var _JohnBugner$elm_storage$Native_Local = function() {
                 if (window.localStorage === undefined) {
                     callback(_elm_lang$core$Native_Scheduler.fail({ctor : "Unavailable"}));
                     return;
+                } else if (window.localStorage === null) {
+                    callback(_elm_lang$core$Native_Scheduler.fail({ctor : "PermissionDenied"}));
+                    return;
                 }
             } catch (e) {
                 if (e.name === "SecurityError") {
@@ -90,6 +99,9 @@ var _JohnBugner$elm_storage$Native_Local = function() {
                 if (window.localStorage === undefined) {
                     callback(_elm_lang$core$Native_Scheduler.fail({ctor : "Unavailable"}));
                     return;
+                } else if (window.localStorage === null) {
+                    callback(_elm_lang$core$Native_Scheduler.fail({ctor : "PermissionDenied"}));
+                    return;
                 }
             } catch (e) {
                 if (e.name === "SecurityError") {
@@ -110,6 +122,9 @@ var _JohnBugner$elm_storage$Native_Local = function() {
             try {
                 if (window.localStorage === undefined) {
                     callback(_elm_lang$core$Native_Scheduler.fail({ctor : "Unavailable"}));
+                    return;
+                } else if (window.localStorage === null) {
+                    callback(_elm_lang$core$Native_Scheduler.fail({ctor : "PermissionDenied"}));
                     return;
                 }
             } catch (e) {
